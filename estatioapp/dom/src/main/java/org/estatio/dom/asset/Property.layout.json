@@ -25,7 +25,10 @@
         "Property": {
           "members": {
             "type": {},
-            "area": {}
+            "area": {},
+            "calculatedArea": {
+              "hidden": {"where": "ALL_TABLES"}
+            }
           }
         },
         "Dates": {

@@ -18,9 +18,14 @@
  */
 package org.estatio.dom.asset;
 
+import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
+import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 
 import org.joda.time.LocalDate;
 
@@ -35,6 +40,7 @@ import org.apache.isis.applib.annotation.Programmatic;
 import org.apache.isis.applib.annotation.SemanticsOf;
 import org.apache.isis.applib.annotation.Where;
 import org.apache.isis.applib.services.clock.ClockService;
+import org.apache.isis.applib.services.jdosupport.IsisJdoSupport;
 
 import org.estatio.dom.EstatioDomainService;
 import org.estatio.dom.RegexValidation;
@@ -116,6 +122,21 @@ public class Units extends EstatioDomainService<Unit> {
         return allMatches("findByPropertyAndActiveOnDate", "property", property, "date", date);
     }
 
+    @Programmatic
+    public BigDecimal sumAreaByPropertyAndActiveOnDate(final Property property, final LocalDate date) {
+        final PersistenceManager persistenceManager = isisJdoSupport.getJdoPersistenceManager();
+        Query query = persistenceManager.newQuery(
+                "SELECT sum(area) "
+                + "FROM org.estatio.dom.asset.Unit "
+                + "WHERE (property == _property) "
+                + "&& (startDate == null || startDate <= _date) "
+                + "&& (endDate == null || endDate >= _date)");
+        query.declareParameters("Property _property, org.joda.time.LocalDate _date");
+        BigDecimal sum = (BigDecimal) query.execute(property, date);
+        query.closeAll();
+        return sum;
+    }
+
     // //////////////////////////////////////
 
     @Collection(hidden = Where.EVERYWHERE)
@@ -129,5 +150,36 @@ public class Units extends EstatioDomainService<Unit> {
     public List<Unit> allUnits() {
         return allInstances();
     }
+
+
+    private static Map<String, Object> asMap(final Object ... paramArgs) {
+        final HashMap<String, Object> map = new HashMap<String, Object>();
+        boolean param = true;
+        String paramStr = null;
+        for (final Object paramArg : paramArgs) {
+            if (param) {
+                if (paramArg instanceof String) {
+                    paramStr = (String) paramArg;
+                } else {
+                    throw new IllegalArgumentException("Parameter must be a string");
+                }
+            } else {
+                final Object arg = paramArg;
+                map.put(paramStr, arg);
+                paramStr = null;
+            }
+            param = !param;
+        }
+        if (paramStr != null) {
+            throw new IllegalArgumentException("Must have equal number of parameters and arguments");
+        }
+        return map;
+    }
+
+    @Inject
+    IsisJdoSupport isisJdoSupport;
+
+
+
 
 }

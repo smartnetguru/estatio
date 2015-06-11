@@ -18,9 +18,6 @@
  */
 package org.estatio.integtests.assets;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-
 import javax.inject.Inject;
 
 import org.joda.time.LocalDate;
@@ -38,6 +35,11 @@ import org.estatio.fixture.EstatioBaseLineFixture;
 import org.estatio.fixture.asset.PropertyForKal;
 import org.estatio.fixture.asset.PropertyForOxf;
 import org.estatio.integtests.EstatioIntegrationTest;
+
+import static org.estatio.integtests.VT.bd;
+import static org.estatio.integtests.VT.ld;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 public class UnitsTest extends EstatioIntegrationTest {
 
@@ -94,8 +96,8 @@ public class UnitsTest extends EstatioIntegrationTest {
 
             // when
             Unit unit = units.findUnitByReference(PropertyForOxf.PROPERTY_REFERENCE + "-001");
-            LocalDate startDate = new LocalDate(2013, 1, 1);
-            LocalDate endDate = new LocalDate(2013, 12, 31);
+            LocalDate startDate = ld(2013, 1, 1);
+            LocalDate endDate = ld(2013, 12, 31);
             unit.setEndDate(endDate);
             unit.setStartDate(startDate);
 
@@ -117,4 +119,31 @@ public class UnitsTest extends EstatioIntegrationTest {
             assertThat(units.findByProperty(propertyForOxf).size(), is(25));
         }
     }
+
+    public static class SumAreaByPropertyAndActiveOnDate extends UnitsTest {
+
+        @Test
+        public void happyCase() throws Exception {
+            // given, when
+            Property propertyForOxf = properties.findPropertyByReference(PropertyForOxf.PROPERTY_REFERENCE);
+            // then
+            assertThat(units.sumAreaByPropertyAndActiveOnDate(propertyForOxf, ld(2014,1,1)), is(bd("32500.00")));
+        }
+
+        @Test
+        public void happyCase1() throws Exception {
+            // given
+            Property propertyForOxf = properties.findPropertyByReference(PropertyForOxf.PROPERTY_REFERENCE);
+            Unit unit = units.findUnitByReference(PropertyForOxf.PROPERTY_REFERENCE + "-001");
+            // when
+            unit.setStartDate(ld(2013, 1, 1));
+            unit.setEndDate(ld(2013,12,31));
+            // then
+            assertThat(units.sumAreaByPropertyAndActiveOnDate(propertyForOxf, ld(2012,12,31)), is(bd("32400.00")));
+            assertThat(units.sumAreaByPropertyAndActiveOnDate(propertyForOxf, ld(2013,01,01)), is(bd("32500.00")));
+            assertThat(units.sumAreaByPropertyAndActiveOnDate(propertyForOxf, ld(2013,12,31)), is(bd("32500.00")));
+            assertThat(units.sumAreaByPropertyAndActiveOnDate(propertyForOxf, ld(2014,01,01)), is(bd("32400.00")));
+        }
+    }
+
 }
