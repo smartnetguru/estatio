@@ -392,6 +392,17 @@ public class Lease
         }
     }
 
+    public String validateNewOccupancy(
+            final LocalDate startDate,
+            final Unit unit) {
+        for (Occupancy occupancy : occupanciesRepo.occupancies(unit)){
+            if (occupancy.getInterval().overlaps(new LocalDateInterval(startDate, null))){
+                return "Interval of occupancy overlaps with existing occupancy";
+            }
+        }
+       return null;
+    }
+
     // //////////////////////////////////////
 
     private SortedSet<LeaseItem> items = new TreeSet<LeaseItem>();

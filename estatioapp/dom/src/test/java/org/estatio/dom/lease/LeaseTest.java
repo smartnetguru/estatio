@@ -35,6 +35,12 @@ import com.google.common.collect.Lists;
 
 import org.hamcrest.Matchers;
 import org.hamcrest.core.Is;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+
+import org.hamcrest.Matchers;
+import org.hamcrest.core.Is;
+
 import org.jmock.Expectations;
 import org.jmock.auto.Mock;
 import org.joda.time.LocalDate;
@@ -820,6 +826,40 @@ public class LeaseTest {
             lease.setTenancyEndDate(startDate);
 
             assertNull(lease.getTenancyDuration());
+        }
+    }
+
+    public static class NewOccupancy extends LeaseTest {
+
+        @Mock
+        private DomainObjectContainer mockContainer;
+
+        private Occupancies occupancies;
+
+        @Before
+        public void setUp() throws Exception {
+
+            occupancies = new Occupancies() {
+                @Override
+                public List<Occupancy> occupancies(final Unit unit) {
+                    final Occupancy element = new Occupancy();
+                    element.setStartDate(new LocalDate(2014, 1, 1));
+                    element.setEndDate(new LocalDate(2014, 12, 31));
+                    return ImmutableList.of(element);
+                }
+            };
+
+            lease = new Lease();
+            lease.occupanciesRepo = occupancies;
+        }
+
+        @Test
+        public void validate() {
+
+            assertThat(lease.validateNewOccupancy(new LocalDate(2013, 12, 31), null), is("Interval of occupancy overlaps with existing occupancy"));
+            assertThat(lease.validateNewOccupancy(new LocalDate(2014, 12, 31), null), is("Interval of occupancy overlaps with existing occupancy"));
+            assertNull(lease.validateNewOccupancy(new LocalDate(2015, 1, 1), null));
+
         }
     }
 
