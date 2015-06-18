@@ -83,7 +83,7 @@ language governing permissions and limitations under the License.
     </developers>
 
     <properties>
-        <isis.version>1.9.0-SNAPSHOT</isis.version>
+        <isis.version>1.9.0-20150325-SNAPSHOT</isis.version>
 
         <isis-module-audit.version>1.8.1</isis-module-audit.version>
         <isis-module-command.version>1.8.1</isis-module-command.version>
