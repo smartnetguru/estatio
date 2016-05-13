@@ -44,6 +44,7 @@ import org.apache.isis.applib.annotation.CollectionLayout;
 import org.apache.isis.applib.annotation.DomainObject;
 import org.apache.isis.applib.annotation.DomainObjectLayout;
 import org.apache.isis.applib.annotation.Editing;
+import org.apache.isis.applib.annotation.MemberOrder;
 import org.apache.isis.applib.annotation.Optionality;
 import org.apache.isis.applib.annotation.Parameter;
 import org.apache.isis.applib.annotation.Programmatic;
@@ -606,6 +607,32 @@ public class LeaseItem
         return getTerms().last().default1CreateNext(null, null);
     }
 
+    @MemberOrder(sequence = "1")
+    public List<LeaseItemSource> getSourceItems() {
+        return leaseItemSourceRepository.findByItem(this);
+    }
+
+    public boolean hideSourceItems() {
+        return !getType().useSource();
+    }
+
+    @MemberOrder(sequence = "2", name = "sourceItems")
+    public LeaseItem newSourceItem(
+            final LeaseItem sourceItem
+    ){
+        leaseItemSourceRepository.newSource(this, sourceItem);
+        return this;
+    }
+
+    public boolean hideNewSourceItem() {
+        return !getType().useSource();
+    }
+
+    public SortedSet<LeaseItem> choices0NewSourceItem(final LeaseItem leaseItem){
+        return getLease().getItems();
+        //TODO: Exclude self and items already present in the collection;
+    }
+
     // //////////////////////////////////////
 
     @Action(semantics = SemanticsOf.IDEMPOTENT)
@@ -701,5 +728,7 @@ public class LeaseItem
     @Inject
     EstatioApplicationTenancyRepository estatioApplicationTenancyRepository;
 
+    @Inject
+    private LeaseItemSourceRepository leaseItemSourceRepository;
 
 }
