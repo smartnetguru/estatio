@@ -536,7 +536,7 @@ public class LeaseItem
     @Programmatic
     public BigDecimal valueForDate(final LocalDate date) {
         final LeaseTerm currentTerm = currentTerm(date);
-        return currentTerm != null ? currentTerm.valueForDate(date) : null;
+        return currentTerm != null ? currentTerm.valueForDate(date) : BigDecimal.ZERO;
     }
 
     @Programmatic
@@ -728,7 +728,6 @@ public class LeaseItem
     @Inject
     EstatioApplicationTenancyRepository estatioApplicationTenancyRepository;
 
-    @Inject
-    private LeaseItemSourceRepository leaseItemSourceRepository;
+    @Inject LeaseItemSourceRepository leaseItemSourceRepository;
 
 }

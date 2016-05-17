@@ -18,18 +18,22 @@
  */
 package org.estatio.dom.lease;
 
-import lombok.Getter;
-import lombok.Setter;
-import org.apache.commons.lang3.ObjectUtils;
-import org.apache.isis.applib.annotation.Optionality;
-import org.apache.isis.applib.annotation.Parameter;
-import org.apache.isis.applib.annotation.Programmatic;
-import org.estatio.dom.JdoColumnScale;
-import org.joda.time.LocalDate;
+import java.math.BigDecimal;
 
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.InheritanceStrategy;
-import java.math.BigDecimal;
+
+import org.apache.commons.lang3.ObjectUtils;
+import org.joda.time.LocalDate;
+
+import org.apache.isis.applib.annotation.Optionality;
+import org.apache.isis.applib.annotation.Parameter;
+import org.apache.isis.applib.annotation.Programmatic;
+
+import org.estatio.dom.JdoColumnScale;
+
+import lombok.Getter;
+import lombok.Setter;
 
 @javax.jdo.annotations.PersistenceCapable
 @javax.jdo.annotations.Inheritance(strategy = InheritanceStrategy.SUPERCLASS_TABLE)
@@ -38,7 +42,6 @@ public class LeaseTermForDeposit extends LeaseTerm {
     @Column(allowsNull = "true", scale = 2)
     @Getter @Setter
     private BigDecimal excludedAmount;
-
 
     @Column(allowsNull = "false")
     @Getter @Setter
@@ -52,18 +55,20 @@ public class LeaseTermForDeposit extends LeaseTerm {
     @Column(allowsNull = "true", scale = JdoColumnScale.MONEY)
     private BigDecimal calculatedDepositValue;
 
+    @Getter @Setter
+    @Column(allowsNull = "true", scale = JdoColumnScale.MONEY)
+    private BigDecimal depositBase;
 
     @Getter @Setter
     @Column(allowsNull = "true", scale = JdoColumnScale.MONEY)
     private BigDecimal manualDepositValue;
 
-
-    public LeaseTermForDeposit terminate(final LocalDate endDate){
+    public LeaseTermForDeposit terminate(final LocalDate endDate) {
         setEndDate(endDate);
         return this;
     }
 
-    public LocalDate default0Terminate(){
+    public LocalDate default0Terminate() {
         return LocalDate.now();
     }
 
@@ -95,8 +100,8 @@ public class LeaseTermForDeposit extends LeaseTerm {
             final Fraction fraction,
             final DepositType depositType,
             final BigDecimal excludedAmount
-    ){
-        if (excludedAmount != null && excludedAmount.compareTo(BigDecimal.ZERO)<0){
+    ) {
+        if (excludedAmount != null && excludedAmount.compareTo(BigDecimal.ZERO) < 0) {
             return "Excluded amount should not be negative";
         }
         return null;
@@ -104,7 +109,7 @@ public class LeaseTermForDeposit extends LeaseTerm {
 
     public LeaseTermForDeposit changeManualDepositValue(
             @Parameter(optionality = Optionality.OPTIONAL)
-            final BigDecimal manualDepositValue){
+            final BigDecimal manualDepositValue) {
         setManualDepositValue(manualDepositValue);
         setStatus(LeaseTermStatus.NEW);
         return this;
@@ -114,34 +119,25 @@ public class LeaseTermForDeposit extends LeaseTerm {
         return getManualDepositValue();
     }
 
-            // //////////////////////////////////////
+    // //////////////////////////////////////
 
     @Override
     public BigDecimal valueForDate(LocalDate dueDate) {
         return getInterval().contains(dueDate) ? ObjectUtils.firstNonNull(getManualDepositValue(), getCalculatedDepositValue()) : BigDecimal.ZERO.setScale(2);
-   }
+    }
 
     @Override
     public BigDecimal getEffectiveValue() {
-        return getEndDate() == null ? ObjectUtils.firstNonNull(getManualDepositValue(), getCalculatedDepositValue()) : BigDecimal.ZERO.setScale(2);
+        return ObjectUtils.firstNonNull(getManualDepositValue(), getCalculatedDepositValue());
     }
 
-
     @Override
-    public LeaseTerm verifyUntil(final LocalDate date){
+    public LeaseTerm verifyUntil(final LocalDate date) {
         super.verifyUntil(date);
 
-        if (getEffectiveInterval().contains(date)) {
-
-            BigDecimal undividedAmount = getDepositType().calculateDepositValue(this, date);
-
-            if (getExcludedAmount()!= null) {
-                setCalculatedDepositValue(this.getFraction().calculation(undividedAmount).subtract(getExcludedAmount()));
-            } else {
-                setCalculatedDepositValue(this.getFraction().calculation(undividedAmount));
-            }
-
-        }
+        final BigDecimal base = getDepositType().calculateDepositBase(this, date);
+        setDepositBase(base);
+        setCalculatedDepositValue(this.getFraction().fractionOf(base).subtract(getExcludedAmount() == null ? BigDecimal.ZERO : getExcludedAmount()));
         return this;
     }
 
@@ -173,6 +169,7 @@ public class LeaseTermForDeposit extends LeaseTerm {
         super.copyValuesTo(t);
         t.setExcludedAmount(getExcludedAmount());
         t.setFraction(this.getFraction());
+        t.setDepositType(this.getDepositType());
     }
 
 }

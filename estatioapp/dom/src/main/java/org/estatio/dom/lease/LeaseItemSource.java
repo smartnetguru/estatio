@@ -38,6 +38,12 @@ public class LeaseItemSource extends EstatioDomainObject<LeaseItemSource> implem
         super("item, sourceItem");
     }
 
+    public LeaseItemSource(LeaseItem item, LeaseItem sourceItem) {
+        super("item, sourceItem");
+        this.item = item;
+        this.sourceItem = sourceItem;
+    }
+
     @Override public ApplicationTenancy getApplicationTenancy() {
         return item.getApplicationTenancy();
     }

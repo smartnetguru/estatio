@@ -45,6 +45,7 @@
         </col>
         <col span="4">
             <ns2:fieldSet name="Deposit" id="deposit">
+                <ns2:property id="depositBase"/>
                 <ns2:property id="fraction"/>
                 <ns2:property id="depositType"/>
                 <ns2:property id="excludedAmount">

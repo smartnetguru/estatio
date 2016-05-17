@@ -165,12 +165,29 @@ public abstract class LeaseItemAndTermsAbstract extends EstatioFixtureScript {
             final BigDecimal excludedAmount,
             final ExecutionContext executionContext) {
 
+        //Find the rent Item,
+        final LeaseItem rentItem = findOrCreateLeaseItem(
+                leaseRef,
+                leaseItemAtPath,
+                ChargeRefData.IT_RENT,
+                LeaseItemType.RENT,
+                InvoicingFrequency.QUARTERLY_IN_ADVANCE,
+                executionContext);
+
         final LeaseItem leaseItem = findOrCreateLeaseItem(
                 leaseRef, leaseItemAtPath,
                 ChargeRefData.IT_DEPOSIT,
                 LeaseItemType.DEPOSIT,
                 InvoicingFrequency.QUARTERLY_IN_ADVANCE,
                 executionContext);
+
+        //Link to souce
+        if (leaseItem.getSourceItems().size() == 0) {
+            leaseItem.newSourceItem(rentItem);
+        }
+
+
+
         final LeaseTermForDeposit leaseTerm = (LeaseTermForDeposit) leaseItem.newTerm(startDate, endDate);
 
         leaseTerm.setFraction(fraction);
@@ -292,14 +309,6 @@ public abstract class LeaseItemAndTermsAbstract extends EstatioFixtureScript {
             final String turnoverRentRule,
             final ExecutionContext executionContext) {
 
-        final LeaseItem leaseItem = findOrCreateLeaseItem(
-                leaseRef,
-                leaseItemAtPath,
-                ChargeRefData.IT_TURNOVER_RENT,
-                LeaseItemType.TURNOVER_RENT,
-                InvoicingFrequency.YEARLY_IN_ARREARS,
-                executionContext);
-
         //Find the rent Item,
         final LeaseItem rentItem = findOrCreateLeaseItem(
                 leaseRef,
@@ -309,8 +318,16 @@ public abstract class LeaseItemAndTermsAbstract extends EstatioFixtureScript {
                 InvoicingFrequency.QUARTERLY_IN_ADVANCE,
                 executionContext);
 
-
-
+        final LeaseItem leaseItem = findOrCreateLeaseItem(
+                leaseRef,
+                leaseItemAtPath,
+                ChargeRefData.IT_TURNOVER_RENT,
+                LeaseItemType.TURNOVER_RENT,
+                InvoicingFrequency.YEARLY_IN_ARREARS,
+                executionContext);
+        if (leaseItem.getSourceItems().size() == 0) {
+            leaseItem.newSourceItem(rentItem);
+        }
 
         //Add firtst term
         final LeaseTermForTurnoverRent leaseTerm = (LeaseTermForTurnoverRent) leaseItem.newTerm(startDate, endDate);
