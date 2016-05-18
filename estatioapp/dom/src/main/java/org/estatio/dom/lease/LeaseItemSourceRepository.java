@@ -31,4 +31,6 @@ public class LeaseItemSourceRepository extends UdoDomainRepositoryAndFactory<Lea
 
     @Inject
     FactoryService factoryService;
+
+
 }
