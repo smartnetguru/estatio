@@ -33,7 +33,6 @@ import org.estatio.dom.charge.Charge;
 import org.estatio.dom.charge.Charges;
 import org.estatio.dom.index.IndexRepository;
 import org.estatio.dom.invoice.PaymentMethod;
-import org.estatio.dom.lease.DepositType;
 import org.estatio.dom.lease.Fraction;
 import org.estatio.dom.lease.InvoicingFrequency;
 import org.estatio.dom.lease.Lease;
@@ -161,8 +160,6 @@ public abstract class LeaseItemAndTermsAbstract extends EstatioFixtureScript {
             final LocalDate startDate,
             final LocalDate endDate,
             final Fraction fraction,
-            final DepositType depositType,
-            final BigDecimal excludedAmount,
             final ExecutionContext executionContext) {
 
         //Find the rent Item,
@@ -191,8 +188,6 @@ public abstract class LeaseItemAndTermsAbstract extends EstatioFixtureScript {
         final LeaseTermForDeposit leaseTerm = (LeaseTermForDeposit) leaseItem.newTerm(startDate, endDate);
 
         leaseTerm.setFraction(fraction);
-        leaseTerm.setDepositType(depositType);
-        leaseTerm.setExcludedAmount(excludedAmount);
 
         return executionContext.addResult(this, leaseTerm);
     }

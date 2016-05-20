@@ -112,6 +112,7 @@ public class EstatioOperationalTeardownFixture extends FixtureScript {
         deleteFrom(Event.class);
 
         deleteFrom(BreakOption.class);
+        deleteFrom(LeaseItemSource.class);
         deleteFrom(LeaseTerm.class);
         deleteFrom(LeaseItemSource.class);
         deleteFrom(LeaseItem.class);

@@ -628,9 +628,23 @@ public class LeaseItem
         return !getType().useSource();
     }
 
-    public SortedSet<LeaseItem> choices0NewSourceItem(final LeaseItem leaseItem){
-        return getLease().getItems();
-        //TODO: Exclude self and items already present in the collection;
+    public List<LeaseItem> choices0NewSourceItem(final LeaseItem leaseItem){
+        List<LeaseItem> choices = new ArrayList<>();
+        for (LeaseItem item : getLease().getItems()){
+            if (item != this){
+                for (LeaseItemSource source : getSourceItems()) {
+                    if (source.getSourceItem() != item) {
+                        choices.add(item);
+                    }
+                }
+            }
+        }
+        return choices;
+    }
+
+    @Programmatic
+    public LeaseItem findOrCreateSourceItem(final LeaseItem sourceItem){
+        return leaseItemSourceRepository.findOrCreateSource(this, sourceItem).getSourceItem();
     }
 
     // //////////////////////////////////////

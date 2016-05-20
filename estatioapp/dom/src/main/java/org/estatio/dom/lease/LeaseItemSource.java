@@ -29,7 +29,14 @@ import lombok.Setter;
                 language = "JDOQL",
                 value = "SELECT "
                         + "FROM org.estatio.dom.lease.LeaseItemSource "
-                        + "WHERE item == :item ")})
+                        + "WHERE item == :item "),
+        @javax.jdo.annotations.Query(
+                name = "findByItemAndSourceItem",
+                language = "JDOQL",
+                value = "SELECT "
+                        + "FROM org.estatio.dom.lease.LeaseItemSource "
+                        + "WHERE item == :item && sourceItem == :sourceItem")
+})
 @Unique(name = "LeaseItemSource_item_sourceItem_UNQ", members = {"item", "sourceItem"})
 @DomainObject
 public class LeaseItemSource extends EstatioDomainObject<LeaseItemSource> implements WithApplicationTenancyPropertyLocal {

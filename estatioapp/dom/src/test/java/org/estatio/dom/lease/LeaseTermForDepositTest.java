@@ -19,16 +19,49 @@
 package org.estatio.dom.lease;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
 
+import org.jmock.Expectations;
+import org.jmock.auto.Mock;
 import org.joda.time.LocalDate;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
+import org.apache.isis.core.unittestsupport.jmocking.JUnitRuleMockery2;
+
+import org.estatio.dom.tax.Tax;
 import org.estatio.dom.valuetypes.AbstractInterval;
 import org.estatio.dom.valuetypes.LocalDateInterval;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class LeaseTermForDepositTest {
+
+    @Rule
+    public JUnitRuleMockery2 context = JUnitRuleMockery2.createFor(JUnitRuleMockery2.Mode.INTERFACES_AND_CLASSES);
+
+    @Mock
+    LeaseItem mockLeaseItem;
+
+    @Mock
+    Tax mockTax;
+
+    LeaseTermForDeposit leaseTermForDeposit;
+    BigDecimal depositBase;
+
+    @Before
+    public void setup() {
+        final LeaseItem leaseItem = new LeaseItem() {
+            @Override public List<LeaseItemSource> getSourceItems() {
+                return Arrays.asList(new LeaseItemSource(null, mockLeaseItem));
+            }
+        };
+        leaseItem.setType(LeaseItemType.DEPOSIT);
+        leaseTermForDeposit = new LeaseTermForDeposit();
+        leaseTermForDeposit.setLeaseItem(leaseItem);
+    }
 
     public static class ValueForDate extends LeaseTermForDepositTest {
 
@@ -71,36 +104,151 @@ public class LeaseTermForDepositTest {
 
     }
 
+    public static class IncludeAndExcludeVAT extends LeaseTermForDepositTest {
+
+        @Test
+        public void including_vat() throws Exception {
+
+            context.checking(new Expectations() {
+                {
+                    allowing(mockLeaseItem).getEffectiveTax();
+                    will(returnValue(mockTax));
+                    allowing(mockTax).grossFromNet(with(new BigDecimal("100.00")), with(new LocalDate(2013, 1, 1)));
+                    will(returnValue(new BigDecimal("121.00")));
+                    allowing(mockLeaseItem).valueForDate(with(new LocalDate(2013, 1, 1)));
+                    will(returnValue(new BigDecimal("100.00")));
+                }
+            });
+
+            // given
+            leaseTermForDeposit.setIncludeVat(true);
+
+            // when
+            depositBase = leaseTermForDeposit.calculateDepositBaseValue(new LocalDate(2013, 1, 1));
+
+            //then
+            assertThat(depositBase).isEqualTo(new BigDecimal("121.00"));
+
+        }
+
+        @Test
+        public void excluding_vat() throws Exception {
+
+            context.checking(new Expectations() {
+                {
+                    allowing(mockLeaseItem).valueForDate(with(new LocalDate(2013, 1, 1)));
+                    will(returnValue(new BigDecimal("100.00")));
+                }
+            });
+
+            // given
+            leaseTermForDeposit.setIncludeVat(false);
+
+            // when
+            depositBase = leaseTermForDeposit.calculateDepositBaseValue(new LocalDate(2013, 1, 1));
+
+            //then
+            assertThat(depositBase).isEqualTo(new BigDecimal("100.00"));
+
+        }
+
+    }
+
+    public static class WithFixedCalculationDate extends LeaseTermForDepositTest {
+
+        @Test
+        public void useFixedCalculationDateOverCalculationDate() throws Exception{
+
+            LocalDate fixedCalculationDate = new LocalDate(2012, 1, 1);
+            LocalDate calculationDate = new LocalDate(2013, 1, 1);
+
+            context.checking(new Expectations() {
+                {
+                    allowing(mockLeaseItem).valueForDate(with(calculationDate));
+                    will(returnValue(new BigDecimal("100.00")));
+                    allowing(mockLeaseItem).valueForDate(with(fixedCalculationDate));
+                    will(returnValue(new BigDecimal("99.00")));
+                }
+            });
+
+            // given
+            leaseTermForDeposit.setIncludeVat(false);
+
+            // when
+            leaseTermForDeposit.setFixedDepositCalculationDate(fixedCalculationDate);
+            depositBase = leaseTermForDeposit.calculateDepositBaseValue(calculationDate);
+
+            // then
+            assertThat(depositBase).isEqualTo(new BigDecimal("99.00"));
+
+
+        }
+
+    }
+
+    public static class VerifyUntil extends LeaseTermForDepositTest {
+
+        @Test
+        public void happyCase() throws Exception {
+
+            context.checking(new Expectations() {
+                {
+                    allowing(mockLeaseItem).getEffectiveTax();
+                    will(returnValue(mockTax));
+                    allowing(mockTax).grossFromNet(with(new BigDecimal("100.00")), with(new LocalDate(2013, 1, 1)));
+                    will(returnValue(new BigDecimal("121.00")));
+                    allowing(mockLeaseItem).valueForDate(with(new LocalDate(2013, 1, 1)));
+                    will(returnValue(new BigDecimal("100.00")));
+                }
+            });
+
+            // given
+            leaseTermForDeposit.setFraction(Fraction.M3);
+            leaseTermForDeposit.setIncludeVat(true);
+
+            // when
+            leaseTermForDeposit.verifyUntil(new LocalDate(2013,1,1));
+
+            // then
+            assertThat(leaseTermForDeposit.getCalculatedDepositValue()).isEqualTo(new BigDecimal("30.25"));
+            assertThat(leaseTermForDeposit.getEffectiveValue()).isEqualTo(new BigDecimal("30.25"));
+
+        }
+
+    }
+
     public static class CopyValuesTo extends LeaseTermForDepositTest {
 
         @Test
         public void values_are_copied_correctly() throws Exception {
             // Given
             LeaseTermForDeposit from = new LeaseTermForDeposit();
-            from.setDepositType(DepositType.VALUE_CAN_CHANGE_IN_TIME_EXCLUDING_VAT);
-            from.setExcludedAmount(new BigDecimal("803.12"));
             from.setFraction(Fraction.M1);
+            from.setIncludeVat(true);
+
             LeaseTermForDeposit to = new LeaseTermForDeposit();
 
             // When
             from.copyValuesTo(to);
 
-            //Then
-            assertThat(from.getDepositType()).isEqualTo(to.getDepositType());
+            // Then
             assertThat(from.getFraction()).isEqualTo(to.getFraction());
-            assertThat(from.getExcludedAmount()).isEqualTo(to.getExcludedAmount());
+            assertThat(from.isIncludeVat()).isEqualTo(to.isIncludeVat());
+            assertThat(from.getFixedDepositCalculationDate()).isEqualTo(to.getFixedDepositCalculationDate());
+
+            // and when given
+            from.setFixedDepositCalculationDate(new LocalDate("2012-01-01"));
+
+            // when
+            from.copyValuesTo(to);
+
+            // then
+            assertThat(from.getFixedDepositCalculationDate()).isEqualTo(to.getFixedDepositCalculationDate());
 
         }
     }
 
-    public static class VerifyUntil extends LeaseTermForDepositTest {
 
-        @Test
-        public void xxx() throws Exception {
-            
-        }
-        
-    }
     
     
 

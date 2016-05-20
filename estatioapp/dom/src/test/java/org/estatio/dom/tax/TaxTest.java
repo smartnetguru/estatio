@@ -141,7 +141,7 @@ public class TaxTest {
     public static class GrossFromNet {
 
         @Test
-        public void xxx() throws Exception {
+        public void gross_from_net_correctly_calculated() throws Exception {
             //given
 
             TaxRate rate = new TaxRate();

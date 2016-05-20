@@ -25,8 +25,17 @@ public class LeaseItemSourceRepository extends UdoDomainRepositoryAndFactory<Lea
         return leaseItemSource;
     }
 
+    public LeaseItemSource findOrCreateSource(final LeaseItem item, final LeaseItem sourceItem){
+        final LeaseItemSource sourceFound = findUnique(item, sourceItem);
+        return sourceFound == null ? newSource(item, sourceItem) : sourceFound;
+    }
+
     public List<LeaseItemSource> findByItem(final LeaseItem item) {
         return allMatches("findByItem", "item", item);
+    }
+
+    public LeaseItemSource findUnique(final LeaseItem item, final LeaseItem sourceItem) {
+        return uniqueMatch("findByItemAndSourceItem", "item", item, "sourceItem", sourceItem);
     }
 
     @Inject
