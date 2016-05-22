@@ -10,5 +10,5 @@ GO
 ---------------------------
 
 ALTER TABLE LeaseTerm
-DROP COLUMN excludedAmount, depositValue, depositType, manualDepositValue
+DROP COLUMN excludedAmount, depositValue, depositType
 GO
