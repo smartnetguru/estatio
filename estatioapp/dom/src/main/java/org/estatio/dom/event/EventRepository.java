@@ -29,17 +29,17 @@ import org.apache.isis.applib.annotation.Programmatic;
 import org.estatio.dom.UdoDomainRepositoryAndFactory;
 
 @DomainService(nature = NatureOfService.DOMAIN, repositoryFor = Event.class)
-public class Events extends UdoDomainRepositoryAndFactory<Event> {
+public class EventRepository extends UdoDomainRepositoryAndFactory<Event> {
 
-    public Events() {
-        super(Events.class, Event.class);
+    public EventRepository() {
+        super(EventRepository.class, Event.class);
     }
 
     // //////////////////////////////////////
 
     @Programmatic
     public List<Event> findBySource(final EventSource eventSource) {
-        final List<EventSourceLink> links = eventSourceLinks.findBySource(eventSource);
+        final List<EventSourceLink> links = eventSourceLinkRepository.findBySource(eventSource);
         return Lists.newArrayList(
                 Iterables.transform(links, EventSourceLink.Functions.event()));
     }
@@ -48,7 +48,7 @@ public class Events extends UdoDomainRepositoryAndFactory<Event> {
     public Event findBySourceAndCalendarName(
             final EventSource eventSource,
             final String calendarName) {
-        final EventSourceLink link = eventSourceLinks.findBySourceAndCalendarName(eventSource, calendarName);
+        final EventSourceLink link = eventSourceLinkRepository.findBySourceAndCalendarName(eventSource, calendarName);
         return link != null? link.getEvent(): null;
     }
 
@@ -66,7 +66,7 @@ public class Events extends UdoDomainRepositoryAndFactory<Event> {
 
     @Programmatic
     public void remove(Event event) {
-        final EventSourceLink link = eventSourceLinks.findByEvent(event);
+        final EventSourceLink link = eventSourceLinkRepository.findByEvent(event);
         removeIfNotAlready(link);
         getContainer().flush();
         removeIfNotAlready(event);
@@ -86,5 +86,5 @@ public class Events extends UdoDomainRepositoryAndFactory<Event> {
 
 
     @Inject
-    private EventSourceLinks eventSourceLinks;
+    private EventSourceLinkRepository eventSourceLinkRepository;
 }

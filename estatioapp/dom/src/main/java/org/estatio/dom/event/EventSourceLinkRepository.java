@@ -34,7 +34,7 @@ import org.estatio.dom.communicationchannel.CommunicationChannelOwnerLink;
         nature = NatureOfService.DOMAIN,
         repositoryFor = EventSourceLink.class
 )
-public class EventSourceLinks {
+public class EventSourceLinkRepository {
 
     //region > init
     PolymorphicAssociationLink.Factory<Event,EventSource,EventSourceLink,EventSourceLink.InstantiateEvent> linkFactory;
