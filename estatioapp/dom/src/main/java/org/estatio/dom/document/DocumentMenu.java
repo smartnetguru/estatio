@@ -17,20 +17,17 @@
 package org.estatio.dom.document;
 
 import java.util.List;
+
+import javax.inject.Inject;
+
 import org.apache.isis.applib.annotation.DomainService;
 import org.apache.isis.applib.annotation.DomainServiceLayout;
 import org.apache.isis.applib.annotation.MemberOrder;
-import org.estatio.dom.UdoDomainRepositoryAndFactory;
-import org.estatio.dom.utils.StringUtils;
+import org.apache.isis.applib.annotation.NatureOfService;
 
-@DomainService()
+@DomainService(nature = NatureOfService.VIEW_MENU_ONLY)
 @DomainServiceLayout(named = "Other", menuBar = DomainServiceLayout.MenuBar.PRIMARY, menuOrder = "80.10")
-public class Documents extends UdoDomainRepositoryAndFactory<Document> {
-
-    public Documents()
-    {
-        super(Documents.class, Document.class);
-    }
+public class DocumentMenu {
 
     public String getId() {
         return "documents";
@@ -42,11 +39,13 @@ public class Documents extends UdoDomainRepositoryAndFactory<Document> {
 
     @MemberOrder(sequence = "2")
     public List<Document> allDocuments() {
-        return allInstances(Document.class);
+        return documentRepository.allDocuments();
     }
 
     public List<Document> findByName(final String pattern) {
-        return allMatches("findByName", "pattern", StringUtils.wildcardToCaseInsensitiveRegex(pattern));
+        return documentRepository.findByName(pattern);
     }
 
+    @Inject
+    private DocumentRepository documentRepository;
 }

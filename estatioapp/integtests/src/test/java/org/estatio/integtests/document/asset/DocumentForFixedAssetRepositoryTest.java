@@ -21,7 +21,6 @@ package org.estatio.integtests.document.asset;
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.ws.rs.HEAD;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -34,7 +33,7 @@ import org.estatio.dom.asset.PropertyRepository;
 import org.estatio.dom.document.Document;
 import org.estatio.dom.document.DocumentType;
 import org.estatio.dom.document.asset.DocumentForFixedAsset;
-import org.estatio.dom.document.asset.DocumentsForFixedAsset;
+import org.estatio.dom.document.asset.DocumentForFixedAssetRepository;
 import org.estatio.fixture.EstatioBaseLineFixture;
 import org.estatio.fixture.asset.PropertyForOxfGb;
 import org.estatio.fixture.interactivemap.InteractiveMapDocumentForOxf;
@@ -43,14 +42,14 @@ import org.estatio.integtests.EstatioIntegrationTest;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-public class DocumentsForFixedAssetsTest extends EstatioIntegrationTest {
+public class DocumentForFixedAssetRepositoryTest extends EstatioIntegrationTest {
 
     @Inject
-    DocumentsForFixedAsset documents;
+    DocumentForFixedAssetRepository documentForFixedAssetRepository;
 
     @Before
     public void setupData() {
-        runScript(new FixtureScript() {
+        runFixtureScript(new FixtureScript() {
             @Override
             protected void execute(ExecutionContext executionContext) {
                 executionContext.executeChild(this, new EstatioBaseLineFixture());
@@ -60,19 +59,19 @@ public class DocumentsForFixedAssetsTest extends EstatioIntegrationTest {
 
     }
 
-    public static class AllDocuments extends DocumentsForFixedAssetsTest {
+    public static class AllDocuments extends DocumentForFixedAssetRepositoryTest {
 
         @Test
         public void allDocuments() throws Exception {
             // given
             // when
-            final List<Document> result = documents.allDocuments();
+            final List<Document> result = documentForFixedAssetRepository.allDocuments();
             // then
             assertThat(result.size(), is(1));
         }
     }
 
-    public static class FindByFixedAsset extends DocumentsForFixedAssetsTest {
+    public static class FindByFixedAsset extends DocumentForFixedAssetRepositoryTest {
 
         @Inject
         private PropertyMenu propertyMenu;
@@ -84,13 +83,13 @@ public class DocumentsForFixedAssetsTest extends EstatioIntegrationTest {
             // given
             final Property property = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
             // when
-            final List<DocumentForFixedAsset> document = documents.findByFixedAsset(property);
+            final List<DocumentForFixedAsset> document = documentForFixedAssetRepository.findByFixedAsset(property);
             // then
             assertThat(document.size(), is(1));
         }
     }
 
-    public static class FindByFixedAssetAndType extends DocumentsForFixedAssetsTest {
+    public static class FindByFixedAssetAndType extends DocumentForFixedAssetRepositoryTest {
 
         @Inject
         private PropertyMenu propertyMenu;
@@ -102,7 +101,7 @@ public class DocumentsForFixedAssetsTest extends EstatioIntegrationTest {
             // given
             final Property property = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
             // when
-            final List<DocumentForFixedAsset> document = documents.findByFixedAssetAndType(property, DocumentType.INTERACTIVE_MAP);
+            final List<DocumentForFixedAsset> document = documentForFixedAssetRepository.findByFixedAssetAndType(property, DocumentType.INTERACTIVE_MAP);
             // then
             assertThat(document.size(), is(1));
         }

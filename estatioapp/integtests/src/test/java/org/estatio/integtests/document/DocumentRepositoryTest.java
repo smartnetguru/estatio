@@ -18,9 +18,6 @@
  */
 package org.estatio.integtests.document;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-
 import java.util.List;
 
 import javax.inject.Inject;
@@ -31,15 +28,18 @@ import org.junit.Test;
 import org.apache.isis.applib.fixturescripts.FixtureScript;
 
 import org.estatio.dom.document.Document;
-import org.estatio.dom.document.Documents;
+import org.estatio.dom.document.DocumentRepository;
 import org.estatio.fixture.EstatioBaseLineFixture;
 import org.estatio.fixture.interactivemap.InteractiveMapDocumentForOxf;
 import org.estatio.integtests.EstatioIntegrationTest;
 
-public class DocumentsTest extends EstatioIntegrationTest {
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
+public class DocumentRepositoryTest extends EstatioIntegrationTest {
 
     @Inject
-    Documents documents;
+    DocumentRepository documentRepository;
 
     @Before
     public void setupData() {
@@ -53,25 +53,25 @@ public class DocumentsTest extends EstatioIntegrationTest {
 
     }
 
-    public static class AllDocuments extends DocumentsTest {
+    public static class AllDocuments extends DocumentRepositoryTest {
 
         @Test
         public void allDocuments() throws Exception {
             // given
             // when
-            final List<Document> result = documents.allDocuments();
+            final List<Document> result = documentRepository.allDocuments();
             // then
             assertThat(result.size(), is(1));
         }
     }
 
-    public static class FindByName extends DocumentsTest {
+    public static class FindByName extends DocumentRepositoryTest {
 
         @Test
         public void happyCase() throws Exception {
             // given
             // when
-            final List<Document> result = documents.findByName("*V*");
+            final List<Document> result = documentRepository.findByName("*V*");
             // then
             assertThat(result.size(), is(1));
         }

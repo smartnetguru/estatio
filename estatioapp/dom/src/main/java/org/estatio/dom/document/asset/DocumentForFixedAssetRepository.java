@@ -1,5 +1,7 @@
 /*
- *  Copyright 2015 Eurocommercial Properties NV
+ *
+ *  Copyright 2012-2015 Eurocommercial Properties NV
+ *
  *
  *  Licensed under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
@@ -14,16 +16,13 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
+
 package org.estatio.dom.document.asset;
 
 import java.util.List;
 
-import org.apache.isis.applib.DomainObjectContainer;
 import org.apache.isis.applib.annotation.DomainService;
-import org.apache.isis.applib.annotation.DomainServiceLayout;
-import org.apache.isis.applib.annotation.MemberOrder;
 import org.apache.isis.applib.annotation.NatureOfService;
-import org.apache.isis.applib.annotation.ParameterLayout;
 import org.apache.isis.applib.annotation.Programmatic;
 import org.apache.isis.applib.value.Blob;
 
@@ -32,26 +31,34 @@ import org.estatio.dom.asset.FixedAsset;
 import org.estatio.dom.document.Document;
 import org.estatio.dom.document.DocumentType;
 
-@DomainService(nature = NatureOfService.VIEW)
-@DomainServiceLayout(named = "Other", menuBar = DomainServiceLayout.MenuBar.PRIMARY, menuOrder = "80.10")
-public class DocumentsForFixedAsset extends UdoDomainRepositoryAndFactory<DocumentForFixedAsset> {
+@DomainService(nature = NatureOfService.DOMAIN, repositoryFor = DocumentForFixedAsset.class)
+public class DocumentForFixedAssetRepository extends UdoDomainRepositoryAndFactory<DocumentForFixedAsset> {
 
-    public DocumentsForFixedAsset()
-    {
-        super(DocumentsForFixedAsset.class, DocumentForFixedAsset.class);
+    public DocumentForFixedAssetRepository() {
+        super(DocumentForFixedAssetRepository.class, DocumentForFixedAsset.class);
     }
 
-    public String getId() {
-        return "documentsForFixedAsset";
+    // //////////////////////////////////////
+
+    @Programmatic
+    public DocumentForFixedAsset newDocument(
+            final String name,
+            final Blob file,
+            final FixedAsset fixedAsset,
+            final DocumentType type) {
+        DocumentForFixedAsset document = newTransientInstance(DocumentForFixedAsset.class);
+        document.setName(name);
+        document.setFile(file);
+        document.setFixedAsset(fixedAsset);
+        persistIfNotAlready(document);
+        return document;
     }
 
-    public String iconName() {
-        return "Document";
-    }
+    // //////////////////////////////////////
 
-    @MemberOrder(sequence = "2")
+    @Programmatic
     public List<Document> allDocuments() {
-        return container.allInstances(Document.class);
+        return allInstances(Document.class);
     }
 
     @Programmatic
@@ -68,23 +75,4 @@ public class DocumentsForFixedAsset extends UdoDomainRepositoryAndFactory<Docume
     public DocumentForFixedAsset findFirstByFixedAssetAndType(final FixedAsset fixedAsset, final DocumentType type) {
         return firstMatch("findByFixedAssetAndType", "fixedAsset", fixedAsset, "type", type);
     }
-
-    @MemberOrder(sequence = "1")
-    public DocumentForFixedAsset newDocument(
-            final @ParameterLayout(named = "Name") String name,
-            final @ParameterLayout(named = "File") Blob file,
-            final FixedAsset fixedAsset,
-            final @ParameterLayout(named = "Type") DocumentType type) {
-        DocumentForFixedAsset document = container.newTransientInstance(DocumentForFixedAsset.class);
-        document.setName(name);
-        document.setFile(file);
-        document.setFixedAsset(fixedAsset);
-        container.persist(document);
-        return document;
-    }
-
-    // //////////////////////////////////////
-
-    @javax.inject.Inject
-    private DomainObjectContainer container;
 }
