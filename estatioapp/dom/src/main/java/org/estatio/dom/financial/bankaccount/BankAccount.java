@@ -169,6 +169,6 @@ public class BankAccount
     FixedAssetFinancialAccountRepository fixedAssetFinancialAccountRepository;
 
     @Inject
-    BankAccounts bankAccounts;
+    BankAccountRepository bankAccountRepository;
 
 }

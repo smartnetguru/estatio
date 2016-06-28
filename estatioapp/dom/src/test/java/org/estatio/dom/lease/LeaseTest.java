@@ -60,7 +60,7 @@ import org.estatio.dom.bankmandate.Scheme;
 import org.estatio.dom.bankmandate.SequenceType;
 import org.estatio.dom.charge.Charge;
 import org.estatio.dom.financial.bankaccount.BankAccount;
-import org.estatio.dom.financial.bankaccount.BankAccounts;
+import org.estatio.dom.financial.bankaccount.BankAccountRepository;
 import org.estatio.dom.invoice.PaymentMethod;
 import org.estatio.dom.party.Party;
 import org.estatio.dom.party.PartyForTesting;
@@ -230,7 +230,7 @@ public class LeaseTest {
         @Mock
         private AgreementTypeRepository mockAgreementTypeRepository;
         @Mock
-        private BankAccounts mockFinancialAccounts;
+        private BankAccountRepository mockBankAccountRepository;
         @Mock
         private ClockService mockClockService;
         @Mock
@@ -365,7 +365,7 @@ public class LeaseTest {
             lease.agreementRoleTypeRepository = mockAgreementRoleTypeRepository;
             lease.agreementRoleRepository = mockAgreementRoleRepository;
             lease.agreementTypeRepository = mockAgreementTypeRepository;
-            lease.financialAccounts = mockFinancialAccounts;
+            lease.bankAccountRepository = mockBankAccountRepository;
             lease.clockService = mockClockService;
             lease.bankMandateRepository = mockBankMandateRepository;
         }
@@ -412,7 +412,7 @@ public class LeaseTest {
 
             context.checking(new Expectations() {
                 {
-                    oneOf(mockFinancialAccounts).findBankAccountsByOwner(tenant);
+                    oneOf(mockBankAccountRepository).findBankAccountsByOwner(tenant);
                     will(returnValue(Collections.emptyList()));
                 }
             });
@@ -432,7 +432,7 @@ public class LeaseTest {
 
             context.checking(new Expectations() {
                 {
-                    allowing(mockFinancialAccounts).findBankAccountsByOwner(tenant);
+                    allowing(mockBankAccountRepository).findBankAccountsByOwner(tenant);
                     will(returnValue(Lists.newArrayList(bankAccount)));
                 }
             });
@@ -484,7 +484,7 @@ public class LeaseTest {
 
             context.checking(new Expectations() {
                 {
-                    oneOf(mockFinancialAccounts).findBankAccountsByOwner(tenant);
+                    oneOf(mockBankAccountRepository).findBankAccountsByOwner(tenant);
                     will(returnValue(Lists.newArrayList(bankAccount)));
                 }
             });
