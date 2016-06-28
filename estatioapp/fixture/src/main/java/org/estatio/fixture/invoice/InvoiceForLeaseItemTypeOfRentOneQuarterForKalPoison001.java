@@ -25,7 +25,7 @@ import org.estatio.dom.invoice.Invoice;
 import org.estatio.dom.invoice.PaymentMethod;
 import org.estatio.dom.lease.Lease;
 import org.estatio.dom.lease.LeaseItemType;
-import org.estatio.fixture.currency.CurrenciesRefData;
+import org.estatio.fixture.currency.CurrencyRepositoryRefData;
 import org.estatio.fixture.lease.LeaseForKalPoison001Nl;
 import org.estatio.fixture.lease.LeaseItemAndLeaseTermForRentForKalPoison001;
 import org.estatio.fixture.party.OrganisationForAcmeNl;
@@ -75,7 +75,7 @@ public class InvoiceForLeaseItemTypeOfRentOneQuarterForKalPoison001 extends Invo
                 applicationTenancy,
                 lease, PARTY_REF_SELLER,
                 PARTY_REF_BUYER, PaymentMethod.DIRECT_DEBIT,
-                CurrenciesRefData.EUR,
+                CurrencyRepositoryRefData.EUR,
                 startDate, executionContext);
 
         createInvoiceItemsForTermsOfFirstLeaseItemOfType(

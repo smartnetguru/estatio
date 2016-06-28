@@ -28,7 +28,7 @@ import org.estatio.dom.invoice.Invoice;
 import org.estatio.dom.invoice.PaymentMethod;
 import org.estatio.dom.lease.Lease;
 import org.estatio.dom.lease.LeaseItemType;
-import org.estatio.fixture.currency.CurrenciesRefData;
+import org.estatio.fixture.currency.CurrencyRepositoryRefData;
 import org.estatio.fixture.lease.LeaseForOxfMiracl005Gb;
 import org.estatio.fixture.lease.LeaseItemAndLeaseTermForDiscountForOxfMiracl005Gb;
 import org.estatio.fixture.party.OrganisationForHelloWorldGb;
@@ -80,7 +80,7 @@ public class InvoiceForLeaseItemTypeOfDiscountOneQuarterForOxfMiracle005 extends
                 PARTY_REF_SELLER,
                 PARTY_REF_BUYER,
                 PaymentMethod.DIRECT_DEBIT,
-                CurrenciesRefData.EUR,
+                CurrencyRepositoryRefData.EUR,
                 invoiceStartDate,
                 executionContext);
 

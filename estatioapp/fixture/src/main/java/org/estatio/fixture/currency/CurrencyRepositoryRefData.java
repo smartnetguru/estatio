@@ -19,12 +19,12 @@
 package org.estatio.fixture.currency;
 
 import javax.inject.Inject;
-import org.estatio.dom.currency.Currencies;
+
 import org.estatio.dom.currency.Currency;
+import org.estatio.dom.currency.CurrencyRepository;
 import org.estatio.fixture.EstatioFixtureScript;
 
-
-public class CurrenciesRefData extends EstatioFixtureScript {
+public class CurrencyRepositoryRefData extends EstatioFixtureScript {
 
     public static final String EUR = "EUR";
     public static final String SEK = "SEK";
@@ -40,11 +40,11 @@ public class CurrenciesRefData extends EstatioFixtureScript {
     }
 
     private void createCurrency(String reference, String name, ExecutionContext executionContext) {
-        final Currency currency = currencies.findOrCreateCurrency(reference, name);
+        final Currency currency = currencyRepository.findOrCreateCurrency(reference, name);
         executionContext.addResult(this, currency.getReference(), currency);
     }
 
     @Inject
-    Currencies currencies;
+    CurrencyRepository currencyRepository;
 
 }
