@@ -19,10 +19,12 @@
 package org.estatio.integtests.geography;
 
 import javax.inject.Inject;
+
 import org.junit.Before;
 import org.junit.Test;
-import org.estatio.dom.geography.CountryRepository;
+
 import org.estatio.dom.geography.Country;
+import org.estatio.dom.geography.CountryRepository;
 import org.estatio.fixture.EstatioBaseLineFixture;
 import org.estatio.fixture.geography.CountriesRefData;
 import org.estatio.integtests.EstatioIntegrationTest;
@@ -30,16 +32,14 @@ import org.estatio.integtests.EstatioIntegrationTest;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-public class CountriesTest extends EstatioIntegrationTest {
-    public static class FindCountryByReference extends CountriesTest {
+public class CountryRepositoryTest extends EstatioIntegrationTest {
 
-        @Before
-        public void setupData() {
-            runFixtureScript(new EstatioBaseLineFixture());
-        }
+    @Before
+    public void setupData() {
+        runFixtureScript(new EstatioBaseLineFixture());
+    }
 
-        @Inject
-        private CountryRepository countryRepository;
+    public static class FindCountry extends CountryRepositoryTest {
 
         @Test
         public void whenExists() throws Exception {
@@ -48,4 +48,7 @@ public class CountriesTest extends EstatioIntegrationTest {
         }
 
     }
+
+    @Inject
+    CountryRepository countryRepository;
 }
