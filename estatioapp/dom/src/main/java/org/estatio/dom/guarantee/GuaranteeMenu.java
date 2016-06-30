@@ -23,7 +23,7 @@ import org.estatio.dom.RegexValidation;
 import org.estatio.dom.UdoDomainService;
 import org.estatio.dom.agreement.AgreementRoleTypeRepository;
 import org.estatio.dom.agreement.AgreementTypeRepository;
-import org.estatio.dom.financial.FinancialAccounts;
+import org.estatio.dom.financial.FinancialAccountRepository;
 import org.estatio.dom.lease.Lease;
 import org.estatio.dom.utils.StringUtils;
 import org.joda.time.LocalDate;
@@ -87,7 +87,7 @@ public class GuaranteeMenu extends UdoDomainService<Guarantee> {
     private AgreementRoleTypeRepository agreementRoleTypeRepository;
 
     @Inject
-    private FinancialAccounts financialAccounts;
+    private FinancialAccountRepository financialAccountRepository;
 
     @Inject
     private Guarantees guarantees;

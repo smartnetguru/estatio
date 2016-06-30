@@ -20,8 +20,8 @@ package org.estatio.integtests.guarantee;
 
 import org.apache.isis.applib.fixturescripts.FixtureScript;
 import org.estatio.dom.financial.FinancialAccount;
+import org.estatio.dom.financial.FinancialAccountRepository;
 import org.estatio.dom.financial.FinancialAccountType;
-import org.estatio.dom.financial.FinancialAccounts;
 import org.estatio.dom.guarantee.Guarantee;
 import org.estatio.dom.guarantee.GuaranteeType;
 import org.estatio.dom.guarantee.Guarantees;
@@ -74,7 +74,7 @@ public class GuaranteesTest extends EstatioIntegrationTest {
     OnLease onLease;
 
     @Inject
-    FinancialAccounts financialAccounts;
+    FinancialAccountRepository financialAccountRepository;
 
     public static class NewGuarantee extends GuaranteesTest {
 
@@ -247,7 +247,7 @@ public class GuaranteesTest extends EstatioIntegrationTest {
         @Test
         public void findFor() throws Exception {
             // given
-            FinancialAccount account = financialAccounts.findAccountByReference(LeaseForOxfTopModel001Gb.REF + "-D");
+            FinancialAccount account = financialAccountRepository.findAccountByReference(LeaseForOxfTopModel001Gb.REF + "-D");
 
             // when
             Guarantee guarantee = guarantees.findFor(account);

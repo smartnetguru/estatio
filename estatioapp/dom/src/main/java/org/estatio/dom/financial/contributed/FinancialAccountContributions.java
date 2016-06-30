@@ -42,7 +42,7 @@ import org.estatio.dom.financial.FinancialAccount;
 import org.estatio.dom.financial.FinancialAccountTransaction;
 import org.estatio.dom.financial.FinancialAccountTransactions;
 import org.estatio.dom.financial.FinancialAccountType;
-import org.estatio.dom.financial.FinancialAccounts;
+import org.estatio.dom.financial.FinancialAccountRepository;
 import org.estatio.dom.guarantee.Guarantee;
 import org.estatio.dom.party.Party;
 
@@ -60,7 +60,7 @@ public class FinancialAccountContributions extends UdoDomainService<FinancialAcc
             final FinancialAccountType financialAccountType,
             final @Parameter(regexPattern = RegexValidation.REFERENCE) String reference,
             final String name) {
-        return financialAccounts.newFinancialAccount(financialAccountType, reference, name, owner);
+        return financialAccountRepository.newFinancialAccount(financialAccountType, reference, name, owner);
     }
 
     // //////////////////////////////////////
@@ -68,7 +68,7 @@ public class FinancialAccountContributions extends UdoDomainService<FinancialAcc
     @Action(semantics = SemanticsOf.SAFE)
     @ActionLayout(contributed = Contributed.AS_ASSOCIATION)
     public List<FinancialAccount> financialAccounts(final Party owner) {
-        return financialAccounts.findAccountsByOwner(owner);
+        return financialAccountRepository.findAccountsByOwner(owner);
     }
 
     // //////////////////////////////////////
@@ -100,7 +100,7 @@ public class FinancialAccountContributions extends UdoDomainService<FinancialAcc
     // //////////////////////////////////////
 
     @Inject
-    private FinancialAccounts financialAccounts;
+    private FinancialAccountRepository financialAccountRepository;
 
     @Inject
     private FinancialAccountTransactions financialAccountTransactions;

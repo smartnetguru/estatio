@@ -44,9 +44,9 @@ import org.estatio.dom.agreement.AgreementRoleTypeRepository;
 import org.estatio.dom.agreement.AgreementType;
 import org.estatio.dom.agreement.AgreementTypeRepository;
 import org.estatio.dom.financial.FinancialAccount;
+import org.estatio.dom.financial.FinancialAccountRepository;
 import org.estatio.dom.financial.FinancialAccountTransactions;
 import org.estatio.dom.financial.FinancialAccountType;
-import org.estatio.dom.financial.FinancialAccounts;
 import org.estatio.dom.lease.Lease;
 import org.estatio.dom.party.Party;
 import org.estatio.dom.utils.StringUtils;
@@ -102,7 +102,7 @@ public class Guarantees extends UdoDomainRepositoryAndFactory<Guarantee> {
 
         FinancialAccountType financialAccountType = guaranteeType.getFinancialAccountType();
         if (financialAccountType != null) {
-            FinancialAccount financialAccount = financialAccounts.newFinancialAccount(
+            FinancialAccount financialAccount = financialAccountRepository.newFinancialAccount(
                     financialAccountType,
                     reference,
                     name,
@@ -180,7 +180,7 @@ public class Guarantees extends UdoDomainRepositoryAndFactory<Guarantee> {
     private AgreementRoleTypeRepository agreementRoleTypeRepository;
 
     @Inject
-    private FinancialAccounts financialAccounts;
+    private FinancialAccountRepository financialAccountRepository;
 
     @Inject
     private FinancialAccountTransactions financialAccountTransactions;

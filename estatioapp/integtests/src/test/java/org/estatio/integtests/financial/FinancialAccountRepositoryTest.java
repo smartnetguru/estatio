@@ -30,8 +30,8 @@ import org.apache.isis.applib.fixturescripts.FixtureScript;
 import org.apache.isis.applib.services.wrapper.WrapperFactory;
 
 import org.estatio.dom.financial.FinancialAccount;
+import org.estatio.dom.financial.FinancialAccountRepository;
 import org.estatio.dom.financial.FinancialAccountType;
-import org.estatio.dom.financial.FinancialAccounts;
 import org.estatio.dom.financial.bankaccount.BankAccount;
 import org.estatio.dom.financial.contributed.FinancialAccountContributions;
 import org.estatio.dom.party.Parties;
@@ -45,7 +45,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
-public class FinancialAccountsTest extends EstatioIntegrationTest {
+public class FinancialAccountRepositoryTest extends EstatioIntegrationTest {
 
     @Before
     public void setupData() {
@@ -53,13 +53,13 @@ public class FinancialAccountsTest extends EstatioIntegrationTest {
             @Override
             protected void execute(ExecutionContext executionContext) {
                 executionContext.executeChild(this, new EstatioBaseLineFixture());
-                    executionContext.executeChild(this, new BankAccountAndMandateForTopModelGb());
+                executionContext.executeChild(this, new BankAccountAndMandateForTopModelGb());
             }
         });
     }
 
     @Inject
-    FinancialAccounts financialAccounts;
+    FinancialAccountRepository financialAccountRepository;
 
     @Inject
     Parties parties;
@@ -71,12 +71,12 @@ public class FinancialAccountsTest extends EstatioIntegrationTest {
         party = parties.findPartyByReference(OrganisationForTopModelGb.REF);
     }
 
-    public static class FindAccountByReference extends FinancialAccountsTest {
+    public static class FindAccountByReference extends FinancialAccountRepositoryTest {
 
         @Test
         public void forAccount() {
             // when
-            FinancialAccount account = financialAccounts.findAccountByReference(BankAccountAndMandateForTopModelGb.REF);
+            FinancialAccount account = financialAccountRepository.findAccountByReference(BankAccountAndMandateForTopModelGb.REF);
             // then
             assertThat(account, is(notNullValue()));
             Assert.assertThat(account instanceof BankAccount, is(true));
@@ -85,26 +85,26 @@ public class FinancialAccountsTest extends EstatioIntegrationTest {
 
     }
 
-    public static class FindAccountsByOwner extends FinancialAccountsTest {
+    public static class FindAccountsByOwner extends FinancialAccountRepositoryTest {
 
         @Test
         public void findAccountsByOwner() throws Exception {
             // when
-            List<FinancialAccount> accounts = financialAccounts.findAccountsByOwner(party);
+            List<FinancialAccount> accounts = financialAccountRepository.findAccountsByOwner(party);
             assertThat(accounts.size(), is(1));
 
             // then
             assertThat(accounts.get(0).getReference(), is(BankAccountAndMandateForTopModelGb.REF));
-            
+
         }
     }
 
-    public static class FindAccountsByTypeOwner extends FinancialAccountsTest {
+    public static class FindAccountsByTypeOwner extends FinancialAccountRepositoryTest {
 
         @Test
         public void findAccountsByTypeOwner() throws Exception {
             // when
-            List<FinancialAccount> accounts = financialAccounts.findAccountsByTypeOwner(FinancialAccountType.BANK_ACCOUNT, party);
+            List<FinancialAccount> accounts = financialAccountRepository.findAccountsByTypeOwner(FinancialAccountType.BANK_ACCOUNT, party);
             assertThat(accounts.size(), is(1));
 
             // then
@@ -112,40 +112,40 @@ public class FinancialAccountsTest extends EstatioIntegrationTest {
         }
     }
 
-    public static class AddAccount extends FinancialAccountsTest {
+    public static class AddAccount extends FinancialAccountRepositoryTest {
 
         @Test
         public void addAccountTest() throws Exception {
 
             // given
-            List<FinancialAccount> accounts = financialAccounts.findAccountsByOwner(party);
+            List<FinancialAccount> accounts = financialAccountRepository.findAccountsByOwner(party);
             assertThat(accounts.size(), is(1));
 
             // when
-            financialAccounts.newFinancialAccount(FinancialAccountType.BANK_ACCOUNT, "123", "test", party);
+            financialAccountRepository.newFinancialAccount(FinancialAccountType.BANK_ACCOUNT, "123", "test", party);
 
             // then
-            accounts = financialAccounts.findAccountsByOwner(party);
+            accounts = financialAccountRepository.findAccountsByOwner(party);
             assertThat(accounts.size(), is(2));
 
         }
 
     }
 
-    public static class AddAccountWrapped extends FinancialAccountsTest {
+    public static class AddAccountWrapped extends FinancialAccountRepositoryTest {
 
         @Test
         public void addAccountTest() throws Exception {
 
             // given
-            List<FinancialAccount> accounts = financialAccounts.findAccountsByOwner(party);
+            List<FinancialAccount> accounts = financialAccountRepository.findAccountsByOwner(party);
             assertThat(accounts.size(), is(1));
 
             // when
             wrapperFactory.wrap(financialAccountContributions).addAccount(party, FinancialAccountType.BANK_ACCOUNT, "123", "test");
 
             // then
-            accounts = financialAccounts.findAccountsByOwner(party);
+            accounts = financialAccountRepository.findAccountsByOwner(party);
             assertThat(accounts.size(), is(2));
 
         }
