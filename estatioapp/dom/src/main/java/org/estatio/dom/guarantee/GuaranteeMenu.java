@@ -58,7 +58,7 @@ public class GuaranteeMenu extends UdoDomainService<Guarantee> {
             final BigDecimal startAmount
             ) {
 
-        return guarantees.newGuarantee(lease,reference,name,guaranteeType,startDate,endDate,description,contractualAmount,startAmount);
+        return guaranteeRepository.newGuarantee(lease,reference,name,guaranteeType,startDate,endDate,description,contractualAmount,startAmount);
     }
 
     // //////////////////////////////////////
@@ -68,14 +68,14 @@ public class GuaranteeMenu extends UdoDomainService<Guarantee> {
     public List<Guarantee> findGuarantees(
             final @ParameterLayout(named = "Reference, Name or Comments", describedAs = "May include wildcards '*' and '?'") String refOrNameOrComments) {
         String pattern = StringUtils.wildcardToCaseInsensitiveRegex(refOrNameOrComments);
-        return guarantees.findGuarantees(refOrNameOrComments);
+        return guaranteeRepository.findGuarantees(refOrNameOrComments);
     }
 
 
     @Action(semantics = SemanticsOf.SAFE, restrictTo = RestrictTo.PROTOTYPING)
     @MemberOrder(sequence = "99")
     public List<Guarantee> allGuarantees() {
-        return guarantees.allGuarantees();
+        return guaranteeRepository.allGuarantees();
     }
 
     // //////////////////////////////////////
@@ -90,6 +90,6 @@ public class GuaranteeMenu extends UdoDomainService<Guarantee> {
     private FinancialAccountRepository financialAccountRepository;
 
     @Inject
-    private Guarantees guarantees;
+    private GuaranteeRepository guaranteeRepository;
 
 }

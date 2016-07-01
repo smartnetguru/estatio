@@ -18,13 +18,23 @@
  */
 package org.estatio.integtests.guarantee;
 
+import java.math.BigDecimal;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.joda.time.LocalDate;
+import org.junit.Before;
+import org.junit.Test;
+
 import org.apache.isis.applib.fixturescripts.FixtureScript;
+
 import org.estatio.dom.financial.FinancialAccount;
 import org.estatio.dom.financial.FinancialAccountRepository;
 import org.estatio.dom.financial.FinancialAccountType;
 import org.estatio.dom.guarantee.Guarantee;
+import org.estatio.dom.guarantee.GuaranteeRepository;
 import org.estatio.dom.guarantee.GuaranteeType;
-import org.estatio.dom.guarantee.Guarantees;
 import org.estatio.dom.guarantee.contributed.OnLease;
 import org.estatio.dom.lease.Lease;
 import org.estatio.dom.lease.LeaseMenu;
@@ -35,18 +45,10 @@ import org.estatio.fixture.guarantee.GuaranteeForOxfTopModel001Gb;
 import org.estatio.fixture.lease.LeaseForOxfTopModel001Gb;
 import org.estatio.integtests.EstatioIntegrationTest;
 import org.estatio.integtests.VT;
-import org.joda.time.LocalDate;
-import org.junit.Before;
-import org.junit.Test;
 
-import javax.inject.Inject;
-import java.math.BigDecimal;
-import java.util.List;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.assertThat;
-
-public class GuaranteesTest extends EstatioIntegrationTest {
+public class GuaranteeRepositoryTest extends EstatioIntegrationTest {
 
     @Before
     public void setupData() {
@@ -68,7 +70,7 @@ public class GuaranteesTest extends EstatioIntegrationTest {
     LeaseRepository leaseRepository;
 
     @Inject
-    Guarantees guarantees;
+    GuaranteeRepository guaranteeRepository;
 
     @Inject
     OnLease onLease;
@@ -76,7 +78,7 @@ public class GuaranteesTest extends EstatioIntegrationTest {
     @Inject
     FinancialAccountRepository financialAccountRepository;
 
-    public static class NewGuarantee extends GuaranteesTest {
+    public static class NewGuarantee extends GuaranteeRepositoryTest {
 
         private Lease lease;
         private Guarantee guarantee;
@@ -91,8 +93,8 @@ public class GuaranteesTest extends EstatioIntegrationTest {
         public void setup() {
             lease = leaseRepository.findLeaseByReference(LeaseForOxfTopModel001Gb.REF);
 
-            assertThat(lease.getPrimaryParty(), is(not(nullValue())));
-            assertThat(lease.getSecondaryParty(), is(not(nullValue())));
+            assertThat(lease.getPrimaryParty()).isNotNull();
+            assertThat(lease.getSecondaryParty()).isNotNull();
 
             startDate = lease.getStartDate();
             endDate = startDate.plusYears(1);
@@ -106,31 +108,31 @@ public class GuaranteesTest extends EstatioIntegrationTest {
             guaranteeType = GuaranteeType.BANK_GUARANTEE;
 
             // when
-            guarantee = guarantees.newGuarantee(lease, guaranteeType.name(), guaranteeType.name(), guaranteeType, startDate, endDate, description, maximumAmount, null);
+            guarantee = guaranteeRepository.newGuarantee(lease, guaranteeType.name(), guaranteeType.name(), guaranteeType, startDate, endDate, description, maximumAmount, null);
 
             // then
-            assertThat(guarantee.getLease(), is(lease));
-            assertThat(guarantee.getName(), is(guaranteeType.name()));
-            assertThat(guarantee.getDescription(), is(description));
+            assertThat(guarantee.getLease()).isEqualTo(lease);
+            assertThat(guarantee.getName()).isEqualTo(guaranteeType.name());
+            assertThat(guarantee.getDescription()).isEqualTo(description);
 
-            assertThat(guarantee.getStartDate(), is(startDate));
-            assertThat(guarantee.getEndDate(), is(endDate));
-            assertThat(guarantee.getTerminationDate(), is(nullValue()));
+            assertThat(guarantee.getStartDate()).isEqualTo(startDate);
+            assertThat(guarantee.getEndDate()).isEqualTo(endDate);
+            assertThat(guarantee.getTerminationDate()).isNull();
 
-            assertThat(guarantee.getPrimaryParty(), is(lease.getPrimaryParty()));
-            assertThat(guarantee.getSecondaryParty(), is(lease.getSecondaryParty()));
+            assertThat(guarantee.getPrimaryParty()).isEqualTo(lease.getPrimaryParty());
+            assertThat(guarantee.getSecondaryParty()).isEqualTo(lease.getSecondaryParty());
 
-            assertThat(guarantee.getContractualAmount(), is(maximumAmount));
+            assertThat(guarantee.getContractualAmount()).isEqualTo(maximumAmount);
 
             FinancialAccount financialAccount = guarantee.getFinancialAccount();
-            assertThat(financialAccount, is(not(nullValue())));
+            assertThat(financialAccount).isNotNull();
 
             // and then
-            assertThat(financialAccount.getType(), is(FinancialAccountType.BANK_GUARANTEE));
-            assertThat(financialAccount.getOwner(), is(lease.getSecondaryParty()));
-            assertThat(financialAccount.getName(), is(guaranteeType.name()));
-            assertThat(financialAccount.getReference(), is(guaranteeType.name()));
-            assertThat(financialAccount.getExternalReference(), is(nullValue()));
+            assertThat(financialAccount.getType()).isEqualTo(FinancialAccountType.BANK_GUARANTEE);
+            assertThat(financialAccount.getOwner()).isEqualTo(lease.getSecondaryParty());
+            assertThat(financialAccount.getName()).isEqualTo(guaranteeType.name());
+            assertThat(financialAccount.getReference()).isEqualTo(guaranteeType.name());
+            assertThat(financialAccount.getExternalReference()).isNull();
         }
 
         @Test
@@ -139,14 +141,14 @@ public class GuaranteesTest extends EstatioIntegrationTest {
             guaranteeType = GuaranteeType.DEPOSIT;
 
             // when
-            guarantee = guarantees.newGuarantee(lease, guaranteeType.name(), guaranteeType.name(), guaranteeType, startDate, endDate, description, maximumAmount, null);
+            guarantee = guaranteeRepository.newGuarantee(lease, guaranteeType.name(), guaranteeType.name(), guaranteeType, startDate, endDate, description, maximumAmount, null);
 
             // then
             FinancialAccount financialAccount = guarantee.getFinancialAccount();
-            assertThat(financialAccount, is(not(nullValue())));
+            assertThat(financialAccount).isNotNull();
 
             // and then
-            assertThat(financialAccount.getType(), is(FinancialAccountType.GUARANTEE_DEPOSIT));
+            assertThat(financialAccount.getType()).isEqualTo(FinancialAccountType.GUARANTEE_DEPOSIT);
         }
 
         @Test
@@ -155,11 +157,11 @@ public class GuaranteesTest extends EstatioIntegrationTest {
             guaranteeType = GuaranteeType.COMPANY_GUARANTEE;
 
             // when
-            guarantee = guarantees.newGuarantee(lease, guaranteeType.name(), guaranteeType.name(), guaranteeType, startDate, endDate, description, maximumAmount, null);
+            guarantee = guaranteeRepository.newGuarantee(lease, guaranteeType.name(), guaranteeType.name(), guaranteeType, startDate, endDate, description, maximumAmount, null);
 
             // then
             FinancialAccount financialAccount = guarantee.getFinancialAccount();
-            assertThat(financialAccount, is(nullValue()));
+            assertThat(financialAccount).isNull();
         }
 
         @Test
@@ -168,11 +170,11 @@ public class GuaranteesTest extends EstatioIntegrationTest {
             guaranteeType = GuaranteeType.NONE;
 
             // when
-            guarantee = guarantees.newGuarantee(lease, guaranteeType.name(), guaranteeType.name(), guaranteeType, startDate, endDate, description, maximumAmount, null);
+            guarantee = guaranteeRepository.newGuarantee(lease, guaranteeType.name(), guaranteeType.name(), guaranteeType, startDate, endDate, description, maximumAmount, null);
 
             // then
             FinancialAccount financialAccount = guarantee.getFinancialAccount();
-            assertThat(financialAccount, is(nullValue()));
+            assertThat(financialAccount).isNull();
         }
 
         @Test
@@ -181,53 +183,53 @@ public class GuaranteesTest extends EstatioIntegrationTest {
             guaranteeType = GuaranteeType.UNKNOWN;
 
             // when
-            guarantee = guarantees.newGuarantee(lease, guaranteeType.name(), guaranteeType.name(), guaranteeType, startDate, endDate, description, maximumAmount, null);
+            guarantee = guaranteeRepository.newGuarantee(lease, guaranteeType.name(), guaranteeType.name(), guaranteeType, startDate, endDate, description, maximumAmount, null);
 
             // then
             FinancialAccount financialAccount = guarantee.getFinancialAccount();
-            assertThat(financialAccount, is(nullValue()));
+            assertThat(financialAccount).isNull();
         }
     }
 
-    public static class FindGuarantees extends GuaranteesTest {
+    public static class FindGuarantees extends GuaranteeRepositoryTest {
 
         @Test
         public void findGuarantees() throws Exception {
 
             // when
-            List<Guarantee> results = guarantees.findGuarantees(LeaseForOxfTopModel001Gb.REF + "*");
+            List<Guarantee> results = guaranteeRepository.findGuarantees(LeaseForOxfTopModel001Gb.REF + "*");
 
             // then
-            assertThat(results.size(), is(1));
+            assertThat(results.size()).isEqualTo(1);
         }
 
         @Test
         public void findGuaranteesByCommentAsWell() throws Exception {
 
             // given
-            Guarantee guarantee = guarantees.findGuarantees(LeaseForOxfTopModel001Gb.REF + "*").get(0);
+            Guarantee guarantee = guaranteeRepository.findGuarantees(LeaseForOxfTopModel001Gb.REF + "*").get(0);
 
             // when
             guarantee.setComments("My special comment");
 
             // then
-            assertThat(guarantees.findGuarantees("My special" + "*").size(), is(1));
+            assertThat(guaranteeRepository.findGuarantees("My special" + "*").size()).isEqualTo(1);
         }
     }
 
-    public static class FindByReference extends GuaranteesTest {
+    public static class FindByReference extends GuaranteeRepositoryTest {
 
         @Test
         public void findByReference() throws Exception {
             // when
-            Guarantee guarantee = guarantees.findByReference(LeaseForOxfTopModel001Gb.REF + "-D");
+            Guarantee guarantee = guaranteeRepository.findByReference(LeaseForOxfTopModel001Gb.REF + "-D");
 
             // then
-            assertThat(guarantee.getReference(), is(LeaseForOxfTopModel001Gb.REF + "-D"));
+            assertThat(guarantee.getReference()).isEqualTo(LeaseForOxfTopModel001Gb.REF + "-D");
         }
     }
 
-    public static class GuaranteesFinder extends GuaranteesTest {
+    public static class GuaranteesFinder extends GuaranteeRepositoryTest {
 
         @Test
         public void guarantees() throws Exception {
@@ -238,11 +240,26 @@ public class GuaranteesTest extends EstatioIntegrationTest {
             List<Guarantee> results = onLease.guarantees(lease);
 
             // then
-            assertThat(results.size(), is(1));
+            assertThat(results.size()).isEqualTo(1);
         }
     }
 
-    public static class FindFor extends GuaranteesTest {
+    public static class FindByLease extends GuaranteeRepositoryTest {
+
+        @Test
+        public void findByLease() throws Exception {
+            // given
+            Lease lease = leaseRepository.findLeaseByReference(LeaseForOxfTopModel001Gb.REF);
+
+            // when
+            List<Guarantee> results = guaranteeRepository.findByLease(lease);
+
+            // then
+            assertThat(results.size()).isEqualTo(1);
+        }
+    }
+
+    public static class FindFor extends GuaranteeRepositoryTest {
 
         @Test
         public void findFor() throws Exception {
@@ -250,10 +267,10 @@ public class GuaranteesTest extends EstatioIntegrationTest {
             FinancialAccount account = financialAccountRepository.findAccountByReference(LeaseForOxfTopModel001Gb.REF + "-D");
 
             // when
-            Guarantee guarantee = guarantees.findFor(account);
+            Guarantee guarantee = guaranteeRepository.findFor(account);
 
             // then
-            assertThat(guarantee.getReference(), is(LeaseForOxfTopModel001Gb.REF + "-D"));
+            assertThat(guarantee.getReference()).isEqualTo(LeaseForOxfTopModel001Gb.REF + "-D");
         }
     }
 }

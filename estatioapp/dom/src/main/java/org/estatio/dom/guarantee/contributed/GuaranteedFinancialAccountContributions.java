@@ -22,7 +22,8 @@ import org.apache.isis.applib.annotation.Action;
 import org.apache.isis.applib.annotation.SemanticsOf;
 import org.estatio.dom.financial.FinancialAccount;
 import org.estatio.dom.financial.FinancialAccountTransactions;
-import org.estatio.dom.guarantee.Guarantees;
+import org.estatio.dom.guarantee.GuaranteeRepository;
+
 import org.joda.time.LocalDate;
 
 import javax.inject.Inject;
@@ -48,13 +49,13 @@ public class GuaranteedFinancialAccountContributions {
             final FinancialAccount financialAccount // contributee
     ) {
         // don't show if there is no guarantee pointing back to financialAccount
-        return guarantees.findFor(financialAccount) == null;
+        return guaranteeRepository.findFor(financialAccount) == null;
     }
 
     @Inject
     FinancialAccountTransactions financialAccountTransactions;
 
     @Inject
-    Guarantees guarantees;
+    GuaranteeRepository guaranteeRepository;
 
 }

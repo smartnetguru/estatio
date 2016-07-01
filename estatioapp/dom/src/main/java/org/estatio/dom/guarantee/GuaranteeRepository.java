@@ -51,18 +51,19 @@ import org.estatio.dom.lease.Lease;
 import org.estatio.dom.party.Party;
 import org.estatio.dom.utils.StringUtils;
 
-@DomainService(repositoryFor = Guarantee.class, nature = NatureOfService.VIEW_MENU_ONLY)
-public class Guarantees extends UdoDomainRepositoryAndFactory<Guarantee> {
+@DomainService(repositoryFor = Guarantee.class, nature = NatureOfService.DOMAIN)
+public class GuaranteeRepository extends UdoDomainRepositoryAndFactory<Guarantee> {
 
     @Override
     public String iconName() {
         return "Guarantee";
     }
 
-    public Guarantees() {
-        super(Guarantees.class, Guarantee.class);
+    public GuaranteeRepository() {
+        super(GuaranteeRepository.class, Guarantee.class);
     }
 
+    @Programmatic
     public Guarantee newGuarantee(
             final Lease lease,
             final @Parameter(regexPattern = RegexValidation.REFERENCE, regexPatternReplacement = RegexValidation.REFERENCE_DESCRIPTION) String reference,
@@ -119,6 +120,7 @@ public class Guarantees extends UdoDomainRepositoryAndFactory<Guarantee> {
 
     // //////////////////////////////////////
 
+    @Programmatic
     public List<Guarantee> findGuarantees(
             final String refOrNameOrComments) {
         String pattern = StringUtils.wildcardToCaseInsensitiveRegex(refOrNameOrComments);
@@ -127,18 +129,21 @@ public class Guarantees extends UdoDomainRepositoryAndFactory<Guarantee> {
 
     // //////////////////////////////////////
 
+    @Programmatic
     public Guarantee findByReference(final String reference) {
         return firstMatch("findByReference", "reference", reference);
     }
 
     // //////////////////////////////////////
 
+    @Programmatic
     public List<Guarantee> allGuarantees() {
         return allInstances();
     }
 
     // //////////////////////////////////////
 
+    @Programmatic
     public List<Guarantee> findByLease(final Lease lease) {
         return allMatches("findByLease", "lease", lease);
     }

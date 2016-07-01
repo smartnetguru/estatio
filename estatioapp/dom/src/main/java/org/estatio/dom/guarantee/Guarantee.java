@@ -80,7 +80,7 @@ import lombok.Setter;
                         + "|| name.matches(:referenceOrNameOrComments)"
                         + "|| comments.matches(:referenceOrNameOrComments)")
 })
-@DomainObject(editing = Editing.DISABLED, autoCompleteRepository = Guarantees.class, autoCompleteAction = "autoComplete")
+@DomainObject(editing = Editing.DISABLED, autoCompleteRepository = GuaranteeRepository.class, autoCompleteAction = "autoComplete")
 @DomainObjectLayout(bookmarking = BookmarkPolicy.AS_ROOT)
 public class Guarantee
         extends Agreement
