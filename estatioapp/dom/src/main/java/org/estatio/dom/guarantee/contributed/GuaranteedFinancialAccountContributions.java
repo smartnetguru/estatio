@@ -21,7 +21,7 @@ package org.estatio.dom.guarantee.contributed;
 import org.apache.isis.applib.annotation.Action;
 import org.apache.isis.applib.annotation.SemanticsOf;
 import org.estatio.dom.financial.FinancialAccount;
-import org.estatio.dom.financial.FinancialAccountTransactions;
+import org.estatio.dom.financial.FinancialAccountTransactionRepository;
 import org.estatio.dom.guarantee.GuaranteeRepository;
 
 import org.joda.time.LocalDate;
@@ -38,7 +38,7 @@ public class GuaranteedFinancialAccountContributions {
             final String description,
             final BigDecimal amount
             ) {
-        financialAccountTransactions.newTransaction(
+        financialAccountTransactionRepository.newTransaction(
                 financialAccount,
                 transactionDate,
                 description,
@@ -53,7 +53,7 @@ public class GuaranteedFinancialAccountContributions {
     }
 
     @Inject
-    FinancialAccountTransactions financialAccountTransactions;
+    FinancialAccountTransactionRepository financialAccountTransactionRepository;
 
     @Inject
     GuaranteeRepository guaranteeRepository;
